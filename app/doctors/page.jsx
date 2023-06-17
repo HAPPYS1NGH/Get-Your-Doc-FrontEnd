@@ -4,6 +4,7 @@ import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite,
 import { NFTStorage, File } from 'nft.storage'
 import { ABI, contractAddress } from "../../public/utils/contract"
 import Image from 'next/image'
+import { parseEther } from 'viem'
 
 export default function Doctors() {
     const { address } = useAccount()
@@ -33,7 +34,8 @@ export default function Doctors() {
         address: contractAddress,
         abi: ABI,
         functionName: 'addDoctor',
-        args: [cid, fees]
+        args: [cid, fees],
+        value: parseEther('0.1'),
     })
 
     const { write: addDoctorData } = useContractWrite(config)
@@ -53,6 +55,7 @@ export default function Doctors() {
 
     async function onSubmitHandler(event) {
         event.preventDefault();
+        console.log(config)
         setMintingNFT(true)
         try {
             // const allergiesArray = allergies.split(',').map((allergy) => allergy.trim());
