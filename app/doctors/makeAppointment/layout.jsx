@@ -1,6 +1,6 @@
 export const metadata = {
-    title: "Doctors",
-    description: "List of Doctors"
+    title: "Make Appointment",
+    description: "Appointment Form"
 };
 
 export default function DoctorLayout({ children }) {

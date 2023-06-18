@@ -16,7 +16,7 @@ function Header() {
             </div>
             <div className='flex space-x-12'>
                 <Link href="/">Home</Link>
-                <Link href="/about">About Us</Link>
+                <Link href="/patient">Patient</Link>
                 <Link href="/doctors">Doctors</Link>
                 <Link href="/contact">Contact Us</Link>
             </div>

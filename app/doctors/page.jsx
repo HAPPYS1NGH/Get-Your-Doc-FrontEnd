@@ -1,328 +1,114 @@
 'use client'
-import { useState } from 'react'
-import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, } from 'wagmi'
-import { NFTStorage, File } from 'nft.storage'
-import { ABI, contractAddress } from "../../public/utils/contract"
+import { useEffect, useState } from 'react'
+import { useContractRead } from 'wagmi'
+import { ABI, contractAddress, NFTContractAddress, NFTContractABI } from "../../public/utils/contract"
 import Image from 'next/image'
-import { parseEther } from 'viem'
+import { formatEther } from 'viem'
+import Link from 'next/link'
+import Doctor from '../components/Doctor'
 
 export default function Doctors() {
-    const { address } = useAccount()
-    const [id, setId] = useState('')
-    const [name, setName] = useState('')
-    const [dateOfBirth, setDateOfBirth] = useState('')
-    const [education, setEducation] = useState('')
-    const [gender, setGender] = useState('')
-    const [imageUrl, setImageUrl] = useState('')
-    const [languages, setLanguages] = useState('')
-    const [description, setDescription] = useState('')
-    const [specialization, setSpecialization] = useState('')
-    const [experience, setExperience] = useState('')
-    const [fees, setFees] = useState('')
-    const [cid, setCid] = useState('')
-    const [mintingNFT, setMintingNFT] = useState(false)
+    const [tokenURIs, setTokenURIs] = useState([]);
+    const [jsonData, setJsonData] = useState([])
+    const [id, setId] = useState(0)
+    const [doctorAddresses, setDoctorAddresses] = useState([])
+    const [getDoctorFees, setDoctorFees] = useState([])
 
-
-    function getAccessToken() {
-        return process.env.NEXT_PUBLIC_NFT_API_KEY;
-    }
-
-    function makeStorageClient() {
-        return new NFTStorage({ token: getAccessToken() })
-    }
-    const { config } = usePrepareContractWrite({
-        address: contractAddress,
-        abi: ABI,
-        functionName: 'addDoctor',
-        args: [cid, fees],
-        value: parseEther('0.1'),
+    const { data: tokenUriData } = useContractRead({
+        address: NFTContractAddress,
+        abi: NFTContractABI,
+        functionName: 'tokenURI',
+        args: [parseInt(id)]
     })
 
-    const { write: addDoctorData } = useContractWrite(config)
+    const { data: doctorAddress } = useContractRead({
+        address: contractAddress,
+        abi: ABI,
+        functionName: 'getDoctorAddressById',
+        args: [parseInt(id)]
+    })
+    const { data: doctorFees } = useContractRead({
+        address: contractAddress,
+        abi: ABI,
+        functionName: 'getDoctorFeesById',
+        args: [parseInt(id)]
+    })
 
-    // const { data: doctorUri } = useContractRead({
-    //     address: contractAddress,
-    //     abi: ABI,
-    //     functionName: 'getTotalPatients',
-    // })
-    // const { data: doctorFees } = useContractRead({
-    //     address: contractAddress,
-    //     abi: ABI,
-    //     functionName: 'getTotalPatients',
-
-    // })
 
 
-    async function onSubmitHandler(event) {
-        event.preventDefault();
-        console.log(config)
-        setMintingNFT(true)
+    async function fetchDoctorsUri() {
         try {
-            // const allergiesArray = allergies.split(',').map((allergy) => allergy.trim());
-
-            const formData = {
-                description: description,
-                image: new File([imageUrl], `${name}-image.jpg`, { type: 'image/jpg' }),
-                name: `${name}`,
-                attributes: [
-                    {
-                        trait_type: "name",
-                        value: name
-                    },
-                    {
-                        trait_type: "date_of_birth",
-                        value: dateOfBirth
-                    },
-                    {
-                        trait_type: "education",
-                        value: education
-                    },
-                    {
-                        trait_type: "gender",
-                        value: gender
-                    },
-                    {
-                        trait_type: "languages",
-                        value: languages
-                    },
-                    {
-                        trait_type: "specialization",
-                        value: specialization
-                    }
-                ]
-            };
-
-            const client = makeStorageClient()
-            const metadata = await client.store(formData)
-            console.log('Metadata URI: ', metadata.url)
-            setCid(metadata.url);
-            await addDoctorData();
+            do {
+                const data = tokenUriData
+                console.log(data)
+                const uri = data.replace('ipfs://', '');
+                setTokenURIs(prevData => [...prevData, uri])
+                setDoctorAddresses(prevData => [...prevData, doctorAddress])
+                setDoctorFees(prevData => [...prevData, doctorFees])
+                setId(prevId => prevId + 1)
+            }
+            while (data != null)
         }
         catch (error) {
             console.log(error)
         }
-        finally {
-            setMintingNFT(false)
+    }
+
+    async function retrieve(cid, id) {
+        const gatewayURL = `https://gateway.ipfs.io/ipfs/${cid}`;
+        let dataS;
+        console.log(cid)
+        try {
+            const response = await fetch(gatewayURL);
+            const data = await response.json();
+
+            const img = data.image.replace('ipfs://', '');
+            data.image = `https://gateway.ipfs.io/ipfs/${img}`;
+            data.address = doctorAddresses[id];
+            data.fees = formatEther(getDoctorFees[id]);
+            data.id = id;
+            console.log(data);
+            setJsonData(prevData => [...prevData, data]);
+        } catch (error) {
+            console.error('Error fetching metadata:', error);
         }
     }
 
-    async function readBlobData(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-
-            reader.onload = () => {
-                const arrayBuffer = reader.result;
-                const decoder = new TextDecoder("utf-8");
-                const jsonStr = decoder.decode(arrayBuffer);
-                const jsonData = JSON.parse(jsonStr);
-
-                resolve(jsonData);
-            };
-
-            reader.onerror = reject;
-            reader.readAsArrayBuffer(file);
-        });
+    async function fetchDoctorData() {
+        await fetchDoctorsUri()
+        for (let i = 0; i <= tokenURIs.length; i++) {
+            console.log(tokenURIs[i])
+            await retrieve(tokenURIs[i], i)
+        }
+        { console.log(jsonData) }
+        // const uniqueArray = jsonData.reduce((accumulator, value) => {
+        //     if (!accumulator.includes(value)) {
+        //         accumulator.push(value);
+        //     }
+        //     return accumulator;
+        // }, []);
+        // setJsonData(uniqueArray)
     }
 
-    async function retrieve(cid) {
-        // const client = makeRetrievalClient()
-        // const res = await client.get("bafyreihbney7fwhfvmcwdsis2nxy4am56dsbubmup4zyebw5zahcssbh6a")
-        // console.log(`Got a response! [${res.status}] ${res.statusText}`)
-        // if (!res.ok) {
-        //     throw new Error(`failed to get ${cid}`)
-        // }
-        // console.log(res)
-        // const files = await res.blob();
-        // const jsonData = await readBlobData(files);
-        // console.log(jsonData);
-        const metadataCID = 'bafyreihbney7fwhfvmcwdsis2nxy4am56dsbubmup4zyebw5zahcssbh6a';
-        const gatewayURL = `https://gateway.ipfs.io/ipfs/${metadataCID}/metadata.json`;
-        let dataS;
-        fetch(gatewayURL)
-            .then(response => response.json())
-            .then(data => {
-                dataS = data;
-                console.log(data);
-                // Access and use the data as needed
-            })
-            .catch(error => {
-                console.error('Error fetching metadata:', error);
-            });
-        const gatewayURL2 = `https://gateway.ipfs.io/ipfs/${dataS.image}/metadata.json`;
-
-    }
-    async function getPatientData() {
-        console.log(parseInt(patientId))
-        setId(parseInt(patientId))
-    }
-
+    const DoctorCard = jsonData.map((data, index) => {
+        return (
+            <div key={index}>
+                <Doctor jsonData={data} />
+            </div>
+        )
+    })
 
 
     return (
         <div className='px-24'>
-            <h1 className='text-3xl text-center font-bold'>Create a New Profile</h1>
-            <form>
-                <div className="mb-4">
-                    <label htmlFor="name" className="block text-gray-700 font-semibold mb-2">
-                        Name
-                    </label>
-                    <input
-                        type="text"
-                        name="name"
-                        id="name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
-                        required={true}
-                    />
-                </div>
-
-                <div className="mb-4">
-                    <label htmlFor="dateOfBirth" className="block text-gray-700 font-semibold mb-2">
-                        Date of Birth
-                    </label>
-                    <input
-                        type="date"
-                        name="dateOfBirth"
-                        id="dateOfBirth"
-                        value={dateOfBirth}
-                        onChange={(e) => setDateOfBirth(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
-                        required
-                    />
-                </div>
-
-                <div className="mb-4">
-                    <label htmlFor="gender" className="block text-gray-700 font-semibold mb-2">
-                        Gender
-                    </label>
-                    <input
-                        type="text"
-                        name="gender"
-                        id="gender"
-                        value={gender}
-                        onChange={(e) => setGender(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
-                        required
-                    />
-                </div>
-
-                <div className="mb-4">
-                    <label htmlFor="education" className="block text-gray-700 font-semibold mb-2">
-                        Education                    </label>
-                    <input
-                        type="text"
-                        name="education"
-                        id="education"
-                        value={education}
-                        onChange={(e) => setEducation(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
-                        required
-                    />
-                </div>
-                <div className="mb-4">
-                    <label htmlFor="description" className="block text-gray-700 font-semibold mb-2">
-                        Description                    </label>
-                    <input
-                        type="text"
-                        name="description"
-                        id="description"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
-                        required
-                    />
-                </div>
-
-                <div className="mb-4">
-                    <label htmlFor="languages" className="block text-gray-700 font-semibold mb-2">
-                        Languages
-                    </label>
-                    <input
-                        type="text"
-                        name="languages"
-                        id="languages"
-                        value={languages}
-                        onChange={(e) => setLanguages(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
-                        required
-                    />
-                </div>
-                <div className="mb-4">
-                    <label htmlFor="fees" className="block text-gray-700 font-semibold mb-2">
-                        Fees (in Wei)
-                    </label>
-                    <input
-                        type="number"
-                        name="fees"
-                        id="fees"
-                        value={fees}
-                        onChange={(e) => setFees(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
-                        required
-                    />
-                </div>
-
-                <div className="mb-4">
-                    <label htmlFor="specialization" className="block text-gray-700 font-semibold mb-2">
-                        Specialisation
-                    </label>
-                    <input
-                        type="text"
-                        name="specialization"
-                        id="specialization"
-                        value={specialization}
-                        onChange={(e) => setSpecialization(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
-                        required
-                    />
-                </div>
-                <div className="mb-4">
-                    <label htmlFor="experience" className="block text-gray-700 font-semibold mb-2">
-                        Experience
-                    </label>
-                    <input
-                        type="text"
-                        name="experience"
-                        id="experience"
-                        value={experience}
-                        onChange={(e) => setExperience(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
-                        required
-                    />
-                </div>
-                <div className="mb-4">
-                    <label htmlFor="image" className="block text-gray-700 font-semibold mb-2">
-                        Image
-                    </label>
-                    <input
-                        type="file"
-                        name="image"
-                        id="image"
-                        onChange={(e) => setImageUrl(e.target.files[0])}
-                        accept="image/*"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-500"
-                        required
-                    />
-                </div>
-
-                <button
-                    type="submit"
-                    onClick={onSubmitHandler}
-                    className="bg-blue-500 text-white py-2 px-4 rounded-md font-semibold"
-                    disabled={mintingNFT}
-                >{
-                        mintingNFT ?
-                            "Minting NFT..."
-                            :
-                            "Mint NFT"
-                    }
-                </button>
-            </form>
-
+            <Link href='/doctors/register'>Register New Doctor</Link>
+            <h1 className='text-3xl text-center font-bold'>Our Doctors</h1>
             <h1 className='m-10 text-2xl'>Retrieve Profile</h1>
-            <button onClick={retrieve} >REtrive</button>
-            <Image src="https://gateway.ipfs.io/ipfs/bafybeibw2zrx4gzai2mvq6xnxtrgkcwnxojhdp5brqszh65eg2g2ajakta/Doc-image.jpg" alt=" image" width={200} height={200} />
+            <button onClick={fetchDoctorData} >REtrive</button>
+            {
+                DoctorCard
+            }
+
         </div>
     )
 }

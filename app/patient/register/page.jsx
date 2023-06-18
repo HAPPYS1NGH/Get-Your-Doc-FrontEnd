@@ -104,7 +104,7 @@ function Profile() {
 
     return (
         <div className='px-24'>
-            <h1 className='text-3xl text-center font-bold'>Create a New Profile</h1>
+            <h1 className='text-3xl text-center font-bold'>Create a New Patient Profile</h1>
             <form>
                 <div className="mb-4">
                     <label htmlFor="name" className="block text-gray-700 font-semibold mb-2">

@@ -3,7 +3,7 @@ export const metadata = {
     description: "Profile of the user"
 };
 
-export default function ProfileLayout({ children }) {
+export default function PatientLayout({ children }) {
     return (
         <main >
             {children}
