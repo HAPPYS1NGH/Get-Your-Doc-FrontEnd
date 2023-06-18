@@ -4,6 +4,7 @@ import { useAccount, useContractRead } from 'wagmi'
 import { Web3Storage } from 'web3.storage'
 import { ABI, contractAddress } from "../../public/utils/contract"
 import Link from 'next/link'
+import lit from '@/app/lit'
 
 function Patient() {
     const [id, setId] = useState()
@@ -53,6 +54,7 @@ function Patient() {
         const files = await res.files();
         const file = files[0];
         const jsonData = await readBlobData(file);
+
         console.log(jsonData);
         setJsonData(jsonData)
         if (jsonData.name) {

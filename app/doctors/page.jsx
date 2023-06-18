@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react'
 import { useContractRead } from 'wagmi'
 import { ABI, contractAddress, NFTContractAddress, NFTContractABI } from "../../public/utils/contract"
-import Image from 'next/image'
 import { formatEther } from 'viem'
 import Link from 'next/link'
 import Doctor from '../components/Doctor'

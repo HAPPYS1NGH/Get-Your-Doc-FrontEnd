@@ -2,7 +2,8 @@
 import { useState } from 'react'
 import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, } from 'wagmi'
 import { Web3Storage } from 'web3.storage'
-import { ABI, contractAddress } from "../../public/utils/contract"
+import { ABI, contractAddress } from "../../../public/utils/contract"
+import lit from '@/app/lit'
 
 function Profile() {
     const { address } = useAccount()
@@ -53,18 +54,23 @@ function Profile() {
             allergies: allergiesArray,
         };
         const jsonData = JSON.stringify(formData);
-        console.log(jsonData);
+        const { encryptedString, encryptedSymmetricKey } = await lit.encrypt(jsonData);
+        console.log("HHHHHHHh");
+        console.log(encryptedString);
+        console.log(encryptedSymmetricKey);
+        console.log("HHHHHHHh");
         const client = makeStorageClient()
-        const blob = new Blob([jsonData], {
+        const blob = new Blob([encryptedString], {
             type: "application/json",
         });
+
         const files = [
             new File([blob], `${name}-${address}.json`)
         ]
         const cidData = await client.put(files)
         setCid(cidData);
         console.log('stored files with cid:', cid)
-        addPatientData()
+        // addPatientData()
     }
 
     async function readBlobData(file) {
@@ -87,15 +93,17 @@ function Profile() {
 
     async function retrieve(cid) {
         const client = makeStorageClient()
-        const res = await client.get("bafybeie35ghet357ejuvognlhnnjjzldex5nrzinod2tezgzo5723qay24")
+        const res = await client.get("bafybeia6hcple34qxb6no3lrnqsqaxg7uiqnlvuzamhhwro5fik4jgenlm")
         console.log(`Got a response! [${res.status}] ${res.statusText}`)
         if (!res.ok) {
             throw new Error(`failed to get ${cid}`)
         }
         const files = await res.files();
         const file = files[0];
-        const jsonData = await readBlobData(file);
+        const { decryptedString } = await lit.decrypt(file, "151e1d563ea3345c87cac531c99680aefdad2d5bf3563dfa8525e3b35de3a41a1b10a86be914ea62be3173646be97506c39d014c7b6c2f34f84a4b76d316df778af9b2ca48f329d3e35d82eb11b2cdf2c0cc355e3e3e2387fae30c473e900b86513610732391772e9033f38f91bfd762fa9144bd640565bc8bd23910b332752c0000000000000020771c175f44b5724659f474709f0b973a9c6d919592fb335c27065c44ac8b12d4bd15faa26b62217336f94e7e21324183");
+        const jsonData = await readBlobData(decryptedString);
         console.log(jsonData);
+        console.log(decryptedString);
     }
     async function getPatientData() {
         console.log(parseInt(patientId))
@@ -221,7 +229,7 @@ function Profile() {
             </form>
 
             <h1 className='m-10 text-2xl'>Retrieve Profile</h1>
-            <button onClick={getPatientData} >REtrive</button>
+            <button onClick={retrieve} >REtrive</button>
         </div>
     )
 }
