@@ -109,7 +109,7 @@ export default function Doctors() {
     // }
 
     return (
-        <div className='px-24'>
+        <div className='px-24 '>
             <h1 className='text-3xl text-center font-bold'>Create a New Profile</h1>
             <form>
                 <div className="mb-4">
@@ -270,9 +270,6 @@ export default function Doctors() {
                 </button>
             </form>
 
-            {/* <h1 className='m-10 text-2xl'>Retrieve Profile</h1>
-            <button onClick={retrieve} >REtrive</button>
-            <Image src="https://gateway.ipfs.io/ipfs/bafybeibw2zrx4gzai2mvq6xnxtrgkcwnxojhdp5brqszh65eg2g2ajakta/Doc-image.jpg" alt=" image" width={200} height={200} /> */}
         </div>
     )
 }

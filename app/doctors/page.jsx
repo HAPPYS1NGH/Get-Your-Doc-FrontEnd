@@ -100,17 +100,18 @@ export default function Doctors() {
 
 
     return (
-        <div className='px-24'>
-            <Link href='/doctors/register'>Register New Doctor</Link>
-            <Link href='/doctors/makeAppointment'>Make Appointment</Link>
-            <h1 className='text-3xl text-center font-bold'>Our Doctors</h1>
-            <h1 className='m-10 text-2xl'>Retrieve Profile</h1>
-            <button onClick={fetchDoctorData} >REtrive</button>
-            {
-                DoctorCard
-            }
+        <div className="px-24">
+            <h1 className="text-3xl text-center font-bold">Our Doctors</h1>
+            {DoctorCard}
+            <div className="mt-10 mb-2 text-2xl">
+                Retrieve Profile
+            </div>
+            <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md" onClick={fetchDoctorData}>
+                Retrieve
+            </button>
 
         </div>
+
     )
 }
 

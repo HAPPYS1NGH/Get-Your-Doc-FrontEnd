@@ -63,28 +63,29 @@ function Patient() {
 
     return (
         <div>
-            <Link href="/patient/register" className='text-center text-lg'>Register New Patient</Link>
-            {
-                fetchPatientData
-                    ?
-                    <div>
-                        <h1>Patient Name: {jsonData.name}</h1>
-                        <h1>Patient Date of Birth: {jsonData.date_of_birth}</h1>
-                        <h3>Patient Gender: {jsonData.gender}</h3>
-                        <h3>Patient Blood Group: {jsonData.blood_group}</h3>
-                        <h3>Patient Height: {jsonData.height}</h3>
-                        <h3>Patient Weight: {jsonData.weight}</h3>
-                        <h3>Patient Allergies: {jsonData.allergies}</h3>
+
+            <div class="container mx-auto px-4 py-8">
+                {fetchPatientData ? (
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h1 class="text-3xl font-bold mb-4">Patient Name: {jsonData.name}</h1>
+                        <h1 class="text-lg">Patient Date of Birth: {jsonData.date_of_birth}</h1>
+                        <h3 class="text-lg">Patient Gender: {jsonData.gender}</h3>
+                        <h3 class="text-lg">Patient Blood Group: {jsonData.blood_group}</h3>
+                        <h3 class="text-lg">Patient Height: {jsonData.height}</h3>
+                        <h3 class="text-lg">Patient Weight: {jsonData.weight}</h3>
+                        <h3 class="text-lg">Patient Allergies: {jsonData.allergies}</h3>
                     </div>
-                    :
-                    <form >
-                        <label htmlFor="id">Patient Id</label>
-                        <input type="text" placeholder="Enter Patient Id" onChange={(e) => setId(e.target.value)} />
-                        <button onClick={retrieve}>
-                            Click
+                ) : (
+                    <form class="mt-4">
+                        <label for="id" class="block text-lg font-semibold mb-2">Patient ID</label>
+                        <input type="text" id="id" placeholder="Enter Patient ID" class="border border-gray-300 px-4 py-2 rounded-md w-full mb-4" onChange={(e) => setId(e.target.value)} />
+                        <button onClick={retrieve} class="bg-blue-500 hover:bg-blue-600 text-white font-semibold px-4 py-2 rounded-md transition-colors duration-300">
+                            Fetch Patient Data
                         </button>
                     </form>
-            }
+                )}
+            </div>
+
         </div>
     )
 }
