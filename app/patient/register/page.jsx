@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, } from 'wagmi'
 import { Web3Storage } from 'web3.storage'
-import { ABI, contractAddress } from "../../public/utils/contract"
+import { ABI, contractAddress } from "../../../public/utils/contract"
 
 function Profile() {
     const { address } = useAccount()

@@ -102,6 +102,7 @@ export default function Doctors() {
     return (
         <div className='px-24'>
             <Link href='/doctors/register'>Register New Doctor</Link>
+            <Link href='/doctors/makeAppointment'>Make Appointment</Link>
             <h1 className='text-3xl text-center font-bold'>Our Doctors</h1>
             <h1 className='m-10 text-2xl'>Retrieve Profile</h1>
             <button onClick={fetchDoctorData} >REtrive</button>
