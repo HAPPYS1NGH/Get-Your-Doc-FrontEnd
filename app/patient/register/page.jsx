@@ -4,7 +4,7 @@ import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite,
 import { Web3Storage } from 'web3.storage'
 import { ABI, contractAddress } from "../../../public/utils/contract"
 
-function Profile() {
+function RegisterPatient() {
     const { address } = useAccount()
     const [id, setId] = useState('')
     const [name, setName] = useState('')
@@ -85,25 +85,13 @@ function Profile() {
         });
     }
 
-    async function retrieve(cid) {
-        const client = makeStorageClient()
-        const res = await client.get("bafybeie35ghet357ejuvognlhnnjjzldex5nrzinod2tezgzo5723qay24")
-        console.log(`Got a response! [${res.status}] ${res.statusText}`)
-        if (!res.ok) {
-            throw new Error(`failed to get ${cid}`)
-        }
-        const files = await res.files();
-        const file = files[0];
-        const jsonData = await readBlobData(file);
-        console.log(jsonData);
-    }
     async function getPatientData() {
         console.log(parseInt(patientId))
         setId(parseInt(patientId))
     }
 
     return (
-        <div className='px-24'>
+        <div className='px-24 my-10'>
             <h1 className='text-3xl text-center font-bold'>Create a New Patient Profile</h1>
             <form>
                 <div className="mb-4">
@@ -219,11 +207,8 @@ function Profile() {
                     Store Data
                 </button>
             </form>
-
-            <h1 className='m-10 text-2xl'>Retrieve Profile</h1>
-            <button onClick={getPatientData} >REtrive</button>
         </div>
     )
 }
 
-export default Profile
+export default RegisterPatient

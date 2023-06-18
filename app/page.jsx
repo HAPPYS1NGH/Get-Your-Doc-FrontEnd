@@ -11,7 +11,7 @@ export default function Home() {
         <h1 className=" text-6xl font-bold">We Follow a holistic approach to Health Care.</h1>
         <p>This is an online platform which provides a video appointment with your renowned doctors without the need of an intermediary.</p>
         <div className="py-3">
-          <Link href="/services" className="bg-blue-500 py-3  px-5 rounded-lg text-white ">Book an Appointment</Link>
+          <Link href="/doctors/makeAppointment" className="bg-blue-500 py-3  px-5 rounded-lg text-white ">Book an Appointment</Link>
         </div>
       </div>
       <div className="relative my-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-2xl overflow-hidden">
@@ -40,7 +40,7 @@ export default function Home() {
             <TfiBag className="text-blue-900" />
           </div>
           <div className="px-4 space-y-2 w-48">
-            <h1 className="text-white text-lg">24 Hour Service</h1>
+            <h1 className="text-white text-lg">Experienced</h1>
             <p className="text-gray-300 text-sm">This is open to everyone and everyday.</p>
           </div>
         </div>
@@ -52,7 +52,7 @@ export default function Home() {
               className="text-blue-900" />
           </div>
           <div className="px-4 space-y-2 w-48">
-            <h1 className="text-white text-lg">24 Hour Service</h1>
+            <h1 className="text-white text-lg">Quality Service</h1>
             <p className="text-gray-300 text-sm">This is open to everyone and everyday.</p>
           </div>
         </div>

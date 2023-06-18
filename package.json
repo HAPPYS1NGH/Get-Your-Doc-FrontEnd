@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@huddle01/iframe": "^0.0.7",
     "@lit-protocol/lit-node-client": "^2.2.25",
     "@rainbow-me/rainbowkit": "^1.0.1",
     "autoprefixer": "10.4.14",

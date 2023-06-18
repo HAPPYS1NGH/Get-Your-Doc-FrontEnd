@@ -16,6 +16,11 @@ export const ABI = [
     type: "error",
   },
   {
+    inputs: [],
+    name: "DoctorFeesCannotBeZero",
+    type: "error",
+  },
+  {
     inputs: [
       {
         internalType: "uint256",
@@ -125,6 +130,11 @@ export const ABI = [
       },
     ],
     name: "StakeMoreToBecomeDoctor",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "URICannotBeEmpty",
     type: "error",
   },
   {
@@ -305,6 +315,25 @@ export const ABI = [
   {
     inputs: [
       {
+        internalType: "address",
+        name: "doctor",
+        type: "address",
+      },
+    ],
+    name: "doctorIds",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "id",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "uint256",
         name: "id",
         type: "uint256",
@@ -423,6 +452,25 @@ export const ABI = [
   {
     inputs: [
       {
+        internalType: "address",
+        name: "_doctorAddress",
+        type: "address",
+      },
+    ],
+    name: "getDoctorIdByAddress",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
         internalType: "uint256",
         name: "_id",
         type: "uint256",
@@ -451,6 +499,25 @@ export const ABI = [
         internalType: "struct Patient",
         name: "",
         type: "tuple",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_patientAddress",
+        type: "address",
+      },
+    ],
+    name: "getPatientIdByAddress",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -486,10 +553,34 @@ export const ABI = [
         name: "timeslot",
         type: "uint256",
       },
+      {
+        internalType: "string",
+        name: "_meetingId",
+        type: "string",
+      },
     ],
     name: "makeAppointment",
     outputs: [],
     stateMutability: "payable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "patient",
+        type: "address",
+      },
+    ],
+    name: "patientIds",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "id",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
     type: "function",
   },
   {
@@ -530,8 +621,8 @@ export const ABI = [
     type: "function",
   },
 ];
-export const contractAddress = "0xe9694a2A5FCB822B42CE57B15C23bBceF609B201";
-export const NFTContractAddress = "0x22BF6e97A989F21c6e7988389F2a6B7838cdd574";
+export const contractAddress = "0x494de34c5E14161E27968a5E5C734B60341E57D6";
+export const NFTContractAddress = "0x53EfF0B125DD7E60cA296a258DfA84a35d55467D";
 export const NFTContractABI = [
   {
     inputs: [],
@@ -691,6 +782,19 @@ export const NFTContractABI = [
       },
     ],
     name: "balanceOf",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "currentTokenId",
     outputs: [
       {
         internalType: "uint256",
